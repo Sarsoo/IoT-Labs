@@ -62,7 +62,7 @@
   <plugin>
     se.sics.cooja.plugins.SimControl
     <width>417</width>
-    <z>0</z>
+    <z>1</z>
     <height>160</height>
     <location_x>400</location_x>
     <location_y>0</location_y>
@@ -115,7 +115,7 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>422</width>
-    <z>1</z>
+    <z>0</z>
     <height>265</height>
     <location_x>397</location_x>
     <location_y>162</location_y>
