@@ -7,7 +7,7 @@ typedef struct Stats {
 } Stats;
 
 int
-ceil(float in)
+ceil(float in) // self-implement ceil func, no math.h
 {
     int num = (int) in;
     if(in - num > 0) num++;
@@ -15,7 +15,7 @@ ceil(float in)
 }
 
 float
-sqrt(float in)
+sqrt(float in) // self-implement ceil sqrt, no math.h
 {
     float sqrt = in/2;
     float temp = 0;

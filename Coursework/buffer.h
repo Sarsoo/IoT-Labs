@@ -2,31 +2,38 @@
 #define _BUFFER_GUARD
 
 #include "util.h"
+#include "math.h"
+
+float*
+getBuffer(int size)
+{
+    return malloc(size * sizeof(float));
+}
 
 void 
 aggregateBuffer(float *bufferIn, int lengthIn, float *bufferOut, int lengthOut, int groupSize)
 {
-    int requiredGroups = ceil((float)lengthIn/groupSize);
+    int requiredGroups = ceil((float)lengthIn/groupSize); // number of groups
     int finalGroupSize = (lengthIn % groupSize) * groupSize;
 
-    if(requiredGroups > lengthOut)
+    if(requiredGroups > lengthOut) // error
     {
         putFloat((float)lengthIn/groupSize);
         printf(" length out buffer required, %i provided\n", lengthOut);
         return;
     }
 
-    int g;// for group number
-    float *inputPtr = bufferIn;
-    float *outputPtr = bufferOut;
+    int g; // for group number
+    float *inputPtr = bufferIn; // cursor for full buffer
+    float *outputPtr = bufferOut; // cursor for output buffer
     for(g = 0; g < requiredGroups; g++)
     {        
-        int length = groupSize;
-        if(g == requiredGroups - 1 && finalGroupSize != 0) length = finalGroupSize;
+        int length = groupSize; // length of this group's size
+        if(g == requiredGroups - 1 && finalGroupSize != 0) length = finalGroupSize; // shorten if necessary
         
-        *outputPtr = calculateMean(inputPtr, length);
+        *outputPtr = calculateMean(inputPtr, length); // SET
         
-        inputPtr += length;
+        inputPtr += length; // increment both
         outputPtr++;
     }
 }

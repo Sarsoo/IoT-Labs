@@ -9,7 +9,7 @@
   <simulation>
     <title>Aggregator Coursework</title>
     <speedlimit>1.0</speedlimit>
-    <randomseed>123456</randomseed>
+    <randomseed>123461</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
       se.sics.cooja.radiomediums.UDGM
@@ -61,11 +61,11 @@
   </simulation>
   <plugin>
     se.sics.cooja.plugins.SimControl
-    <width>417</width>
+    <width>321</width>
     <z>0</z>
     <height>160</height>
-    <location_x>400</location_x>
-    <location_y>0</location_y>
+    <location_x>48</location_x>
+    <location_y>710</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.Visualizer
@@ -73,11 +73,11 @@
       <skin>se.sics.cooja.plugins.skins.IDVisualizerSkin</skin>
       <viewport>0.9090909090909091 0.0 0.0 0.9090909090909091 153.72871631902638 172.41033658502872</viewport>
     </plugin_config>
-    <width>393</width>
-    <z>4</z>
-    <height>430</height>
-    <location_x>1</location_x>
-    <location_y>1</location_y>
+    <width>314</width>
+    <z>5</z>
+    <height>179</height>
+    <location_x>40</location_x>
+    <location_y>20</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.TimeLine
@@ -89,11 +89,11 @@
       <split>-1</split>
       <zoomfactor>500.0</zoomfactor>
     </plugin_config>
-    <width>397</width>
+    <width>1217</width>
     <z>3</z>
-    <height>443</height>
-    <location_x>0</location_x>
-    <location_y>433</location_y>
+    <height>183</height>
+    <location_x>424</location_x>
+    <location_y>852</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.Notes
@@ -102,7 +102,7 @@
       <decorations>true</decorations>
     </plugin_config>
     <width>6</width>
-    <z>5</z>
+    <z>6</z>
     <height>160</height>
     <location_x>680</location_x>
     <location_y>0</location_y>
@@ -115,10 +115,10 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>1201</width>
-    <z>1</z>
+    <z>2</z>
     <height>706</height>
-    <location_x>397</location_x>
-    <location_y>162</location_y>
+    <location_x>408</location_x>
+    <location_y>15</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.MoteInterfaceViewer
@@ -128,10 +128,23 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>397</width>
-    <z>2</z>
+    <z>1</z>
     <height>179</height>
     <location_x>2</location_x>
     <location_y>247</location_y>
+  </plugin>
+  <plugin>
+    se.sics.cooja.plugins.MoteInterfaceViewer
+    <mote_arg>0</mote_arg>
+    <plugin_config>
+      <interface>Sky LED</interface>
+      <scrollpos>0,0</scrollpos>
+    </plugin_config>
+    <width>317</width>
+    <z>4</z>
+    <height>206</height>
+    <location_x>28</location_x>
+    <location_y>445</location_y>
   </plugin>
 </simconf>
 
