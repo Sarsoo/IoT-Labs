@@ -1,8 +1,8 @@
-#define READING_INTERVAL 1 //in Hz
-#define BUFFER_SIZE 12 // length of buffer to populate
+#define READING_INTERVAL 3 //in Hz
+#define BUFFER_SIZE 9 // length of buffer to populate
 
-#define SD_THRESHOLD 3 // whether to aggregate or flatten
-#define AGGREGATION_GROUP_SIZE 4 // group size to aggregate (4 in spec)
+#define SD_THRESHOLD 300 // whether to aggregate or flatten
+#define AGGREGATION_GROUP_SIZE 3 // group size to aggregate (4 in spec)
 
 #include "contiki.h"
 
@@ -12,8 +12,6 @@
 #include "util.h" // for print methods
 #include "math.h"
 #include "buffer.h"
-
-// text to uncomment and make the sim reload new source
 
 static process_event_t event_buffer_full;
 
@@ -34,10 +32,10 @@ PROCESS_THREAD(sensing_process, ev, data)
     SENSORS_ACTIVATE(light_sensor);
     leds_off(LEDS_ALL);
     
-    static float* buffer;
+    static Buffer buffer;
     buffer = getBuffer(BUFFER_SIZE);
-    clearBuffer(buffer, BUFFER_SIZE);
-    printBuffer(buffer, BUFFER_SIZE);putchar('\n');putchar('\n');
+    clearBuffer(buffer);
+    printBuffer(buffer);putchar('\n');putchar('\n');
     /*END INIT*/
     
     static int counter = 0;
@@ -48,13 +46,13 @@ PROCESS_THREAD(sensing_process, ev, data)
         
         float light_lx = getLight(); // GET
 
-        buffer[counter] = light_lx; // STORE
+        buffer.items[counter] = light_lx; // STORE
         
-        printf("%2i/%i: ", counter + 1, BUFFER_SIZE);putFloat(light_lx);putchar('\n'); // DISPLAY VALUE
+        printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY VALUE
         //printBuffer(buffer, BUFFER_SIZE);putchar('\n'); // DISPLAY CURRENT BUFFER
         
         counter++;
-        if(counter == BUFFER_SIZE) // CHECK WHETHER FULL
+        if(counter == buffer.length) // CHECK WHETHER FULL
         {
             process_post(&aggregator_process, event_buffer_full, &buffer);
             counter = 0;
@@ -76,9 +74,11 @@ PROCESS_THREAD(aggregator_process, ev, data)
         PROCESS_WAIT_EVENT_UNTIL(ev == event_buffer_full);
         leds_on(LEDS_RED);
 
-        float *fullBuffer = *(float **)data;
-        handleBufferRotation(fullBuffer, BUFFER_SIZE);
-        free(fullBuffer);
+        Buffer fullBuffer = *(Buffer *)data;
+        /*********************/
+        handleBufferRotation(fullBuffer);
+        free(fullBuffer.items);
+        /*********************/
     }
 
     PROCESS_END();
@@ -86,36 +86,45 @@ PROCESS_THREAD(aggregator_process, ev, data)
 /*---------------------------------------------------------------------------*/
 // Buffer filled with readings, process and aggregate
 void
-handleBufferRotation(float *buffer, int length)
+handleBufferRotation(Buffer inBuffer)
 {
     printf("Buffer full, aggregating\n\n");
+    
+    Buffer outBuffer; // OUTPUT BUFFER HOLDER
+    // above pointer is assigned a buffer in either of the below cases
 
-    Stats sd = calculateStdDev(buffer, length); // GET BUFFER STATISTICS
+    Stats sd = calculateStdDev(inBuffer.items, inBuffer.length); // GET BUFFER STATISTICS
     if(sd.std > SD_THRESHOLD)
     {// buffer length by 4
         printf("Significant STD: ");putFloat(sd.std);printf(", compressing buffer\n");
-
-        float *outBuffer = getBuffer(length); // CREATE OUTPUT BUFFER
-        clearBuffer(outBuffer, length);
         
-        int outLength = ceil((float)length/AGGREGATION_GROUP_SIZE); // CALCULATE NUMBER OF OUTPUT ELEMENTS
-        aggregateBuffer(buffer, length, outBuffer, outLength, AGGREGATION_GROUP_SIZE);
+        int outLength = ceil((float)inBuffer.length/AGGREGATION_GROUP_SIZE); // CALCULATE NUMBER OF OUTPUT ELEMENTS
+        outBuffer = getBuffer(outLength); // CREATE OUTPUT BUFFER
+    
+        aggregateBuffer(inBuffer, outBuffer, AGGREGATION_GROUP_SIZE);
 
-        handleFinalBuffer(outBuffer, outLength); // PASS FINAL BUFFER
-        free(outBuffer); // RELEASE
     }else
     {// buffer length to 1
         printf("Insignificant STD: ");putFloat(sd.std);printf(", squashing buffer\n");
-
-        handleFinalBuffer(&sd.mean, 1); // PASS FINAL BUFFER
+        
+        outBuffer = getBuffer(1); // CREATE OUTPUT BUFFER
+        outBuffer.items[0] = sd.mean;
     }
+    outBuffer.stats = sd; // final compressed buffer has pointer to stats for uncompressed data in case of further interest
+    
+    /*********************/
+    handleFinalBuffer(outBuffer); // PASS FINAL BUFFER
+    free(outBuffer.items); // RELEASE ITEMS
+    /*********************/
 }
 
 // Process final buffer following aggregation
 void
-handleFinalBuffer(float *buffer, int length)
+handleFinalBuffer(Buffer buffer)
 {
     printf("Final buffer output: ");
-    printBuffer(buffer, length);putchar('\n');putchar('\n');
+    printBuffer(buffer);putchar('\n');
+    printf("Mean: ");putFloat(buffer.stats.mean);putchar('\n');
+    printf("Std Dev: ");putFloat(buffer.stats.std);putchar('\n');putchar('\n');
 }
 /*---------------------------------------------------------------------------*/

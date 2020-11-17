@@ -9,7 +9,7 @@
   <simulation>
     <title>Aggregator Coursework</title>
     <speedlimit>1.0</speedlimit>
-    <randomseed>123461</randomseed>
+    <randomseed>123464</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
       se.sics.cooja.radiomediums.UDGM
@@ -90,7 +90,7 @@
       <zoomfactor>500.0</zoomfactor>
     </plugin_config>
     <width>1217</width>
-    <z>3</z>
+    <z>4</z>
     <height>183</height>
     <location_x>424</location_x>
     <location_y>852</location_y>
@@ -115,7 +115,7 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>1201</width>
-    <z>2</z>
+    <z>3</z>
     <height>706</height>
     <location_x>408</location_x>
     <location_y>15</location_y>
@@ -141,7 +141,7 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>317</width>
-    <z>4</z>
+    <z>2</z>
     <height>206</height>
     <location_x>28</location_x>
     <location_y>445</location_y>

@@ -4,28 +4,36 @@
 #include "util.h"
 #include "math.h"
 
-float*
+typedef struct Buffer {
+    float* items;
+    int length;
+    Stats stats;
+} Buffer;
+
+Buffer
 getBuffer(int size)
 {
-    return malloc(size * sizeof(float));
+    float* memSpace = (float*) malloc(size * sizeof(float));
+    Buffer buffer = {memSpace, size, };
+    return buffer;
 }
 
 void 
-aggregateBuffer(float *bufferIn, int lengthIn, float *bufferOut, int lengthOut, int groupSize)
+aggregateBuffer(Buffer bufferIn, Buffer bufferOut, int groupSize)
 {
-    int requiredGroups = ceil((float)lengthIn/groupSize); // number of groups
-    int finalGroupSize = (lengthIn % groupSize) * groupSize;
+    int requiredGroups = ceil((float)bufferIn.length/groupSize); // number of groups
+    int finalGroupSize = (bufferIn.length % groupSize) * groupSize;
 
-    if(requiredGroups > lengthOut) // error
+    if(requiredGroups > bufferOut.length) // error
     {
-        putFloat((float)lengthIn/groupSize);
-        printf(" length out buffer required, %i provided\n", lengthOut);
+        putFloat((float)bufferIn.length/groupSize);
+        printf(" length out buffer required, %i provided\n", bufferOut.length);
         return;
     }
 
     int g; // for group number
-    float *inputPtr = bufferIn; // cursor for full buffer
-    float *outputPtr = bufferOut; // cursor for output buffer
+    float *inputPtr = bufferIn.items; // cursor for full buffer
+    float *outputPtr = bufferOut.items; // cursor for output buffer
     for(g = 0; g < requiredGroups; g++)
     {        
         int length = groupSize; // length of this group's size
@@ -39,12 +47,13 @@ aggregateBuffer(float *bufferIn, int lengthIn, float *bufferOut, int lengthOut, 
 }
 
 void 
-clearBuffer(float *buffer, int length)
+clearBuffer(Buffer buffer)
 {
+    int length = buffer.length;
     if(length > 0)
     {
         int i;
-        float *bufferPtr = buffer;
+        float *bufferPtr = buffer.items;
         for(i = 0; i < length; i++)
         {
             *bufferPtr = 0.0;
@@ -54,14 +63,15 @@ clearBuffer(float *buffer, int length)
 }
 
 void 
-printBuffer(float *buffer, int length)
+printBuffer(Buffer buffer)
 {
     putchar('[');
 
+    int length = buffer.length;
     if(length > 0)
     {
         int i;
-        float *ptr = buffer;
+        float *ptr = buffer.items;
         for(i = 0; i < length; i++)
         {
             if(i > 0) printf(", ");
