@@ -1,12 +1,17 @@
-#define READING_INTERVAL 3 //in Hz
-#define BUFFER_SIZE 9 // length of buffer to populate
+#define READING_INTERVAL 2 //in Hz
+#define BUFFER_SIZE 12 // length of buffer to populate
 
-#define SD_THRESHOLD 300 // whether to aggregate or flatten
-#define AGGREGATION_GROUP_SIZE 3 // group size to aggregate (4 in spec)
+#define SD_THRESHOLD_SOME 400 // some activity, compress above, flatten below
+#define SD_THRESHOLD_LOTS 1000 // lots of activity, don't aggregate
+
+#define AGGREGATION_GROUP_SIZE 4 // group size to aggregate (4 in spec)
+
+#define INITIAL_STATE true // whether begins running or not
 
 #include "contiki.h"
 
 #include <stdio.h> /* For printf() */
+#include <stdbool.h>
 
 #include "io.h"
 #include "util.h" // for print methods
@@ -16,50 +21,72 @@
 static process_event_t event_buffer_full;
 
 /*---------------------------------------------------------------------------*/
-PROCESS(sensing_process, "Sensing process");
-PROCESS(aggregator_process, "Aggregator process");
+PROCESS(sensing_process, "Sensing process"); // collect data
+PROCESS(aggregator_process, "Aggregator process"); // receive full data buffers for processing
 
 AUTOSTART_PROCESSES(&sensing_process, &aggregator_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(sensing_process, ev, data)
 {
     /*INIT*/
-    static struct etimer timer;
     PROCESS_BEGIN();
-    event_buffer_full = process_alloc_event();
+    
+    static struct etimer timer;
     etimer_set(&timer, CLOCK_SECOND/READING_INTERVAL);
     
-    SENSORS_ACTIVATE(light_sensor);
-    leds_off(LEDS_ALL);
+    event_buffer_full = process_alloc_event();
+    
+    initIO();
+    
+    static bool isRunning = INITIAL_STATE;
     
     static Buffer buffer;
     buffer = getBuffer(BUFFER_SIZE);
-    clearBuffer(buffer);
-    printBuffer(buffer);putchar('\n');putchar('\n');
     /*END INIT*/
     
     static int counter = 0;
     while(1)
     {
-        PROCESS_WAIT_EVENT_UNTIL(ev == PROCESS_EVENT_TIMER);
-        leds_off(LEDS_RED);
+        PROCESS_WAIT_EVENT();
         
-        float light_lx = getLight(); // GET
+        if (ev == PROCESS_EVENT_TIMER){
+            if (isRunning == true) {
+                leds_off(LEDS_RED);
+                
+                float light_lx = getLight(); // GET
 
-        buffer.items[counter] = light_lx; // STORE
-        
-        printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY VALUE
-        //printBuffer(buffer, BUFFER_SIZE);putchar('\n'); // DISPLAY CURRENT BUFFER
-        
-        counter++;
-        if(counter == buffer.length) // CHECK WHETHER FULL
-        {
-            process_post(&aggregator_process, event_buffer_full, &buffer);
-            counter = 0;
-            buffer = getBuffer(BUFFER_SIZE);
+                buffer.items[counter] = light_lx; // STORE
+                
+                printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY CURRENT VALUE
+                //printBuffer(buffer);putchar('\n'); // DISPLAY CURRENT BUFFER
+                
+                counter++;
+                if(counter == buffer.length) // CHECK WHETHER FULL
+                {                
+                    process_post(&aggregator_process, event_buffer_full, &buffer); // pass buffer to processing thread
+                    counter = 0;
+                    buffer = getBuffer(BUFFER_SIZE); // get new buffer for next data, no freeing in this thread
+                }
+            }
+            
+            etimer_reset(&timer);
         }
-
-        etimer_reset(&timer);
+        /* BUTTON CLICKED */
+        else if (ev == sensors_event && data == &button_sensor)
+        {
+            isRunning = !isRunning;
+            if (isRunning == true)
+            {
+                printf("Starting...\n");
+            }
+            else
+            {
+                printf("Stopping, clearing buffer...\n");
+                //freeBuffer(buffer);
+                //buffer = getBuffer(BUFFER_SIZE);
+                counter = 0; // just reset counter, used as index on buffer items, will overwrite
+            }
+        }
     }
 
     PROCESS_END();
@@ -76,8 +103,8 @@ PROCESS_THREAD(aggregator_process, ev, data)
 
         Buffer fullBuffer = *(Buffer *)data;
         /*********************/
-        handleBufferRotation(fullBuffer);
-        free(fullBuffer.items);
+        handleBufferRotation(&fullBuffer); // pass by reference, edited if lots of activity
+        freeBuffer(fullBuffer);
         /*********************/
     }
 
@@ -86,26 +113,41 @@ PROCESS_THREAD(aggregator_process, ev, data)
 /*---------------------------------------------------------------------------*/
 // Buffer filled with readings, process and aggregate
 void
-handleBufferRotation(Buffer inBuffer)
+handleBufferRotation(Buffer *inBufferPtr)
 {
     printf("Buffer full, aggregating\n\n");
     
+    Buffer inBuffer = *inBufferPtr;
     Buffer outBuffer; // OUTPUT BUFFER HOLDER
     // above pointer is assigned a buffer in either of the below cases
 
     Stats sd = calculateStdDev(inBuffer.items, inBuffer.length); // GET BUFFER STATISTICS
-    if(sd.std > SD_THRESHOLD)
-    {// buffer length by 4
-        printf("Significant STD: ");putFloat(sd.std);printf(", compressing buffer\n");
+    
+    /* LOTS OF ACTIVITY - LEAVE */
+    if(sd.std > SD_THRESHOLD_LOTS)
+    {
+        printf("Lots of activity, std. dev.: ");putFloat(sd.std);printf(", leaving as-is\n");
+        
+        outBuffer = getBuffer(1); // get a dummy buffer, will swap items for efficiency
+        
+        swapBufferMemory(inBufferPtr, &outBuffer); // ensures both are freed but no need to copy items
+        
+    }
+    /* SOME ACTIVITY - AGGREGATE */
+    else if(sd.std > SD_THRESHOLD_SOME)
+    {
+        printf("Some activity, std. dev.: ");putFloat(sd.std);printf(", compressing buffer\n");
         
         int outLength = ceil((float)inBuffer.length/AGGREGATION_GROUP_SIZE); // CALCULATE NUMBER OF OUTPUT ELEMENTS
         outBuffer = getBuffer(outLength); // CREATE OUTPUT BUFFER
     
         aggregateBuffer(inBuffer, outBuffer, AGGREGATION_GROUP_SIZE);
 
-    }else
-    {// buffer length to 1
-        printf("Insignificant STD: ");putFloat(sd.std);printf(", squashing buffer\n");
+    }
+    /* NO ACTIVITY - FLATTEN */
+    else
+    {
+        printf("Insignificant std. dev.: ");putFloat(sd.std);printf(", squashing buffer\n");
         
         outBuffer = getBuffer(1); // CREATE OUTPUT BUFFER
         outBuffer.items[0] = sd.mean;
@@ -114,7 +156,7 @@ handleBufferRotation(Buffer inBuffer)
     
     /*********************/
     handleFinalBuffer(outBuffer); // PASS FINAL BUFFER
-    free(outBuffer.items); // RELEASE ITEMS
+    freeBuffer(outBuffer); // RELEASE ITEMS
     /*********************/
 }
 

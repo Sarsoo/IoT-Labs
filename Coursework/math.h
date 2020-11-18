@@ -36,7 +36,8 @@ calculateMean(float buffer[], int length)
         printf("%i items is not valid length\n", length);
         return 0;
     }
-
+    
+    /* SUM */
     float sum = 0;
     int i;
     for(i = 0; i < length; i++)
@@ -44,7 +45,7 @@ calculateMean(float buffer[], int length)
         sum += buffer[i];
     }
     
-    return sum / length;
+    return sum / length; // DIVIDE ON RETURN
 }
 
 Stats
@@ -63,8 +64,8 @@ calculateStdDev(float buffer[], int length)
     int i;
     for(i = 0; i < length; i++)
     {
-        float diffFromMean = buffer[i] - stats.mean;
-        sum += diffFromMean*diffFromMean;
+        float diffFromMean = buffer[i] - stats.mean; // (xi - mu)
+        sum += diffFromMean*diffFromMean; // Sum(diff squared)
     }
     
     stats.std = sqrt(sum/length);

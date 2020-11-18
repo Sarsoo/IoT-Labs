@@ -64,8 +64,8 @@
     <width>321</width>
     <z>0</z>
     <height>160</height>
-    <location_x>48</location_x>
-    <location_y>710</location_y>
+    <location_x>51</location_x>
+    <location_y>875</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.Visualizer
@@ -74,7 +74,7 @@
       <viewport>0.9090909090909091 0.0 0.0 0.9090909090909091 153.72871631902638 172.41033658502872</viewport>
     </plugin_config>
     <width>314</width>
-    <z>5</z>
+    <z>6</z>
     <height>179</height>
     <location_x>40</location_x>
     <location_y>20</location_y>
@@ -90,7 +90,7 @@
       <zoomfactor>500.0</zoomfactor>
     </plugin_config>
     <width>1217</width>
-    <z>4</z>
+    <z>5</z>
     <height>183</height>
     <location_x>424</location_x>
     <location_y>852</location_y>
@@ -102,7 +102,7 @@
       <decorations>true</decorations>
     </plugin_config>
     <width>6</width>
-    <z>6</z>
+    <z>7</z>
     <height>160</height>
     <location_x>680</location_x>
     <location_y>0</location_y>
@@ -127,11 +127,11 @@
       <interface>Temperature and Light</interface>
       <scrollpos>0,0</scrollpos>
     </plugin_config>
-    <width>397</width>
+    <width>340</width>
     <z>1</z>
     <height>179</height>
-    <location_x>2</location_x>
-    <location_y>247</location_y>
+    <location_x>28</location_x>
+    <location_y>227</location_y>
   </plugin>
   <plugin>
     se.sics.cooja.plugins.MoteInterfaceViewer
@@ -141,10 +141,23 @@
       <scrollpos>0,0</scrollpos>
     </plugin_config>
     <width>317</width>
-    <z>2</z>
+    <z>4</z>
     <height>206</height>
     <location_x>28</location_x>
     <location_y>445</location_y>
+  </plugin>
+  <plugin>
+    se.sics.cooja.plugins.MoteInterfaceViewer
+    <mote_arg>0</mote_arg>
+    <plugin_config>
+      <interface>Button</interface>
+      <scrollpos>0,0</scrollpos>
+    </plugin_config>
+    <width>296</width>
+    <z>2</z>
+    <height>115</height>
+    <location_x>54</location_x>
+    <location_y>699</location_y>
   </plugin>
 </simconf>
 

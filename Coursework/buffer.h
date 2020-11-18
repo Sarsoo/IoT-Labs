@@ -11,20 +11,38 @@ typedef struct Buffer {
 } Buffer;
 
 Buffer
-getBuffer(int size)
+getBuffer(int size) // retrieve new buffer with malloc-ed memory space
 {
     float* memSpace = (float*) malloc(size * sizeof(float));
     Buffer buffer = {memSpace, size, };
     return buffer;
 }
 
-void 
+void
+freeBuffer(Buffer buffer) // little abstraction function to act as buffer destructor
+{
+    free(buffer.items);
+}
+
+void
+swapBufferMemory(Buffer *first, Buffer *second) // swap memspaces between buffers
+{
+    float* firstItems = first->items; // swap input buffer and output buffer item pointers
+    first->items = second->items;
+    second->items = firstItems;
+    
+    int firstLength = first->length; // swap lengths to iterate correctly
+    first->length = second->length;
+    second->length = firstLength;
+}
+
+void // perform aggregation into groupSize (4 in the spec) 
 aggregateBuffer(Buffer bufferIn, Buffer bufferOut, int groupSize)
 {
     int requiredGroups = ceil((float)bufferIn.length/groupSize); // number of groups
-    int finalGroupSize = (bufferIn.length % groupSize) * groupSize;
+    int finalGroupSize = (bufferIn.length % groupSize) * groupSize; // work out length of final group if bufferIn not of length that divides nicely
 
-    if(requiredGroups > bufferOut.length) // error
+    if(requiredGroups > bufferOut.length) // error check
     {
         putFloat((float)bufferIn.length/groupSize);
         printf(" length out buffer required, %i provided\n", bufferOut.length);
@@ -39,9 +57,9 @@ aggregateBuffer(Buffer bufferIn, Buffer bufferOut, int groupSize)
         int length = groupSize; // length of this group's size
         if(g == requiredGroups - 1 && finalGroupSize != 0) length = finalGroupSize; // shorten if necessary
         
-        *outputPtr = calculateMean(inputPtr, length); // SET
+        *outputPtr = calculateMean(inputPtr, length); // SET OUTPUT VALUE
         
-        inputPtr += length; // increment both
+        inputPtr += length; // increment both cursors
         outputPtr++;
     }
 }

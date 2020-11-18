@@ -2,7 +2,16 @@
 #define _IO_GUARD
 
 #include "dev/light-sensor.h"
+#include "dev/button-sensor.h"
 #include "dev/leds.h"
+
+void 
+initIO()
+{
+    SENSORS_ACTIVATE(light_sensor);
+    SENSORS_ACTIVATE(button_sensor);
+    leds_off(LEDS_ALL);
+}
 
 // get float from light sensor including transfer function
 float
