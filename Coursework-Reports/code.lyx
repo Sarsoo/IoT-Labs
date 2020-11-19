@@ -155,6 +155,21 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_layout Standard
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
+filename "../Coursework/sax.h"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={SAX header file: z-normalise and stringify buffers}"
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset include
+LatexCommand lstinputlisting
 filename "../Coursework/math.h"
 lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={Math header file: mean, standard deviation, implementations of ceil, sqrt}"
 

@@ -44,8 +44,7 @@ aggregateBuffer(Buffer bufferIn, Buffer bufferOut, int groupSize)
 
     if(requiredGroups > bufferOut.length) // error check
     {
-        putFloat((float)bufferIn.length/groupSize);
-        printf(" length out buffer required, %i provided\n", bufferOut.length);
+        putFloat((float)bufferIn.length/groupSize); printf(" length out buffer required, %i provided\n", bufferOut.length);
         return;
     }
 

@@ -4,9 +4,12 @@
 #define SD_THRESHOLD_SOME 400 // some activity, compress above, flatten below
 #define SD_THRESHOLD_LOTS 1000 // lots of activity, don't aggregate
 
-#define AGGREGATION_GROUP_SIZE 4 // group size to aggregate (4 in spec)
+#define AGGREGATION_GROUP_SIZE 2 // group size to aggregate (4 in spec)
 
 #define INITIAL_STATE true // whether begins running or not
+
+#define SAX // use sax aggregation and transform instead of simple average aggregation
+#define SAX_BREAKPOINTS 10 // number of characters to be used
 
 #include "contiki.h"
 
@@ -17,6 +20,7 @@
 #include "util.h" // for print methods
 #include "math.h"
 #include "buffer.h"
+#include "sax.h"
 
 static process_event_t event_buffer_full;
 
@@ -103,7 +107,11 @@ PROCESS_THREAD(aggregator_process, ev, data)
 
         Buffer fullBuffer = *(Buffer *)data;
         /*********************/
-        handleBufferRotation(&fullBuffer); // pass by reference, edited if lots of activity
+#ifdef SAX
+        handleSAXBufferRotation(&fullBuffer);
+#else
+        handleSimpleBufferRotation(&fullBuffer); // pass by reference, edited if lots of activity
+#endif
         freeBuffer(fullBuffer);
         /*********************/
     }
@@ -113,7 +121,7 @@ PROCESS_THREAD(aggregator_process, ev, data)
 /*---------------------------------------------------------------------------*/
 // Buffer filled with readings, process and aggregate
 void
-handleBufferRotation(Buffer *inBufferPtr)
+handleSimpleBufferRotation(Buffer *inBufferPtr)
 {
     printf("Buffer full, aggregating\n\n");
     
@@ -153,6 +161,31 @@ handleBufferRotation(Buffer *inBufferPtr)
         outBuffer.items[0] = sd.mean;
     }
     outBuffer.stats = sd; // final compressed buffer has pointer to stats for uncompressed data in case of further interest
+    inBuffer.stats = sd;
+    
+    /*********************/
+    handleFinalBuffer(outBuffer); // PASS FINAL BUFFER
+    freeBuffer(outBuffer); // RELEASE ITEMS
+    /*********************/
+}
+
+void
+handleSAXBufferRotation(Buffer *inBufferPtr)
+{
+    printf("Buffer full, SAX-ing\n\n");
+    
+    Buffer inBuffer = *inBufferPtr;
+    Buffer outBuffer; // OUTPUT BUFFER HOLDER
+    // above pointer is assigned a buffer in either of the below cases
+
+    int outLength = ceil((float)inBuffer.length/AGGREGATION_GROUP_SIZE); // CALCULATE NUMBER OF OUTPUT ELEMENTS
+    outBuffer = getBuffer(outLength); // CREATE OUTPUT BUFFER
+    
+    inBuffer.stats = calculateStdDev(inBuffer.items, inBuffer.length); // GET BUFFER STATISTICS
+    outBuffer.stats = inBuffer.stats;
+    
+    normaliseBuffer(inBuffer); // Z NORMALISATION
+    aggregateBuffer(inBuffer, outBuffer, AGGREGATION_GROUP_SIZE); // PAA
     
     /*********************/
     handleFinalBuffer(outBuffer); // PASS FINAL BUFFER
@@ -168,5 +201,12 @@ handleFinalBuffer(Buffer buffer)
     printBuffer(buffer);putchar('\n');
     printf("Mean: ");putFloat(buffer.stats.mean);putchar('\n');
     printf("Std Dev: ");putFloat(buffer.stats.std);putchar('\n');putchar('\n');
+    
+#ifdef SAX
+    char* saxString = stringifyBuffer(buffer);
+    printf("SAX: %s\n\n", saxString);
+    
+    free(saxString);
+#endif
 }
 /*---------------------------------------------------------------------------*/
