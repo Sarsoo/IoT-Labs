@@ -3,7 +3,7 @@
 
 typedef unsigned short USHORT;
 
-//print a unsigned short (as returned from rand) picewise char by char
+//print a unsigned short picewise char by char
 void
 putShort(USHORT in) 
 {

@@ -9,7 +9,7 @@
 #define INITIAL_STATE true // whether begins running or not
 
 #define SAX // use sax aggregation and transform instead of simple average aggregation
-#define SAX_BREAKPOINTS 10 // number of characters to be used
+#define SAX_BREAKPOINTS 4 // number of characters to be used
 
 #include "contiki.h"
 
@@ -35,14 +35,12 @@ PROCESS_THREAD(sensing_process, ev, data)
     /*INIT*/
     PROCESS_BEGIN();
     
+    static bool isRunning = INITIAL_STATE;
     static struct etimer timer;
-    etimer_set(&timer, CLOCK_SECOND/READING_INTERVAL);
+    if(isRunning) etimer_set(&timer, CLOCK_SECOND/READING_INTERVAL); // start timer if running
     
     event_buffer_full = process_alloc_event();
-    
     initIO();
-    
-    static bool isRunning = INITIAL_STATE;
     
     static Buffer buffer;
     buffer = getBuffer(BUFFER_SIZE);
@@ -54,23 +52,20 @@ PROCESS_THREAD(sensing_process, ev, data)
         PROCESS_WAIT_EVENT();
         
         if (ev == PROCESS_EVENT_TIMER){
-            if (isRunning == true) {
-                leds_off(LEDS_RED);
-                
-                float light_lx = getLight(); // GET
+            leds_off(LEDS_RED);
+            
+            float light_lx = getLight(); // GET
 
-                buffer.items[counter] = light_lx; // STORE
-                
-                printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY CURRENT VALUE
-                //printBuffer(buffer);putchar('\n'); // DISPLAY CURRENT BUFFER
-                
-                counter++;
-                if(counter == buffer.length) // CHECK WHETHER FULL
-                {                
-                    process_post(&aggregator_process, event_buffer_full, &buffer); // pass buffer to processing thread
-                    counter = 0;
-                    buffer = getBuffer(BUFFER_SIZE); // get new buffer for next data, no freeing in this thread
-                }
+            buffer.items[counter] = light_lx; // STORE
+            
+            printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY CURRENT VALUE
+            
+            counter++;
+            if(counter == buffer.length) // CHECK WHETHER FULL
+            {                
+                process_post(&aggregator_process, event_buffer_full, &buffer); // pass buffer to processing thread
+                counter = 0;
+                buffer = getBuffer(BUFFER_SIZE); // get new buffer for next data, no freeing in this thread
             }
             
             etimer_reset(&timer);
@@ -82,12 +77,12 @@ PROCESS_THREAD(sensing_process, ev, data)
             if (isRunning == true)
             {
                 printf("Starting...\n");
+                etimer_set(&timer, CLOCK_SECOND/READING_INTERVAL);
             }
             else
             {
                 printf("Stopping, clearing buffer...\n");
-                //freeBuffer(buffer);
-                //buffer = getBuffer(BUFFER_SIZE);
+                etimer_stop(&timer);
                 counter = 0; // just reset counter, used as index on buffer items, will overwrite
             }
         }
@@ -158,10 +153,10 @@ handleSimpleBufferRotation(Buffer *inBufferPtr)
         printf("Insignificant std. dev.: ");putFloat(sd.std);printf(", squashing buffer\n");
         
         outBuffer = getBuffer(1); // CREATE OUTPUT BUFFER
+        
         outBuffer.items[0] = sd.mean;
     }
-    outBuffer.stats = sd; // final compressed buffer has pointer to stats for uncompressed data in case of further interest
-    inBuffer.stats = sd;
+    outBuffer.stats = sd; // final compressed buffer has stats for uncompressed data in case of further interest
     
     /*********************/
     handleFinalBuffer(outBuffer); // PASS FINAL BUFFER

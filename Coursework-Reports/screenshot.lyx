@@ -114,7 +114,30 @@ Andy Pack / 6420013
 \end_layout
 
 \begin_layout Standard
+\begin_inset FloatList figure
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Standard deviation thresholds of 400 for some activity and 1,000 for high
+ activity.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
+placement bh
 wide false
 sideways false
 status open
@@ -122,8 +145,9 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename NonSaxAggregate.png
-	width 100col%
+	filename 12to1.jpg
+	lyxscale 50
+	width 80col%
 
 \end_inset
 
@@ -134,7 +158,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Demonstration of 4-into-1 aggregation taking place following moderate activity
+Demonstration of 12-into-1 aggregation for little activity
 \end_layout
 
 \end_inset
@@ -156,7 +180,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename NonSaxWithRed.png
+	filename 12to3.jpg
+	lyxscale 50
 	width 100col%
 
 \end_inset
@@ -168,9 +193,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Demonstration of both no aggregation for high activity (First output) and
- tight 12-into-1 average for little activity (Last output), red LED on as
- aggregation occurs
+Demonstration of 4-into-1 aggregation for moderate activity
 \end_layout
 
 \end_inset
@@ -192,7 +215,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename SaxBy2,10Break.png
+	filename 12to12.jpg
+	lyxscale 50
 	width 100col%
 
 \end_inset
@@ -204,8 +228,7 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Demonstration of SAX aggregation with window size of 2 and alphabet of length
- 10
+Demonstration of no aggregation for high activity
 \end_layout
 
 \end_inset

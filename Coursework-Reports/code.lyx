@@ -123,7 +123,7 @@ LatexCommand lstlistoflistings
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/coursework.c"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={Main coursework program: 2 processes for reading and aggregating data}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt},caption={Main coursework program: 2 processes for reading and aggregating data}"
 
 \end_inset
 
@@ -141,7 +141,7 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/buffer.h"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={Buffer header file: get, free and manipulate buffers}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt},caption={Buffer header file: get, free and manipulate buffers}"
 
 \end_inset
 
@@ -156,7 +156,7 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/sax.h"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={SAX header file: z-normalise and stringify buffers}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt},caption={SAX header file: z-normalise and stringify buffers}"
 
 \end_inset
 
@@ -171,7 +171,7 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/math.h"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={Math header file: mean, standard deviation, implementations of ceil, sqrt}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt},caption={Math header file: mean, standard deviation, implementations of ceil, sqrt}"
 
 \end_inset
 
@@ -186,7 +186,7 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/io.h"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={IO header file: init function for starting sensors}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt},caption={IO header file: init function for starting sensors}"
 
 \end_inset
 
@@ -201,7 +201,7 @@ lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentst
 \begin_inset CommandInset include
 LatexCommand lstinputlisting
 filename "../Coursework/util.h"
-lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},caption={Other utilities: short and float printing functions from earlier labs}"
+lstparams "breaklines=true,frame=tb,language=C,basicstyle={\\ttfamily},commentstyle={\\color{commentgreen}\\itshape},keywordstyle={\\color{blue}},emphstyle={\\color{red}},stringstyle={\\color{red}},identifierstyle={\\color{cyan}},otherkeywords={PROCESS_THREAD, PROCESS_BEGIN, PROCESS_END, etimer_set, process_alloc_event, initIO, getBuffer, PROCESS_WAIT_EVENT, PROCESS_WAIT_EVENT_UNTIL, leds_off, leds_on, getLight, printf, putFloat, putchar, process_post, etimer_reset, etimer_stop, handleSAXBufferRotation, handleSimpleBufferRotation, free, freeBuffer, calculateStdDev, handleFinalBuffer, ceil, normaliseBuffer, aggregateBuffer, printBuffer, stringifyBuffer, swapBufferMemory, malloc, calculateMean, valueToSAXChar, sqrt, putShort},caption={Other utilities: short and float printing functions from earlier labs}"
 
 \end_inset
 

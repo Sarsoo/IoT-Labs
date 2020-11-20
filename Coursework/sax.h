@@ -36,26 +36,25 @@
 void
 normaliseBuffer(Buffer bufferIn) // z normalise buffer for SAX
 {
-    if(bufferIn.stats.std == 0) // error check
+    if(bufferIn.stats.std == 0) // error check, don't divide by 0
     {
         printf("Standard deviation of zero, unable to normalise\n");
         return;
     }
 
-    int i; // for group number
-    float *inputPtr = bufferIn.items; // cursor for full buffer
+    int i;
+    float *inputPtr = bufferIn.items; // cursor
     for(i = 0; i < bufferIn.length; i++)
     {
         *inputPtr = (*inputPtr - bufferIn.stats.mean) / bufferIn.stats.std;
         
-        inputPtr++; // increment both cursors
+        inputPtr++;
     }
 }
 
 char
 valueToSAXChar(float inputValue)
-{ 
-    float below, above;
+{
     int i;
     for(i = 0; i < SAX_BREAKPOINTS; i++)
     {
@@ -69,7 +68,7 @@ valueToSAXChar(float inputValue)
         }
         else // in between check interval of two breakpoints
         {
-            if(breakPoints[i - 1] < inputValue < breakPoints[i]) return SAX_CHAR_START + i;
+            if((breakPoints[i - 1] < inputValue) && (inputValue  < breakPoints[i])) return SAX_CHAR_START + i;
         }
     }
     return '0';
@@ -78,7 +77,7 @@ valueToSAXChar(float inputValue)
 char* // map buffer of normalised floats into SAX chars
 stringifyBuffer(Buffer bufferIn)
 {
-    char* outputString = (char*) malloc((bufferIn.length + 1) * sizeof(char));
+    char* outputString = (char*) malloc((bufferIn.length + 1) * sizeof(char)); // +1 for null terminator
     
     int i;
     for(i = 0; i < bufferIn.length; i++)

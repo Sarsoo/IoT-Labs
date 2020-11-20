@@ -36,7 +36,7 @@ customHeadersFooters
 \output_sync 0
 \bibtex_command default
 \index_command default
-\paperfontsize default
+\paperfontsize 10
 \spacing single
 \use_hyperref true
 \pdf_title "IoT Aggregation Algorithm Coursework"
@@ -117,21 +117,224 @@ Andy Pack / 6420013
 Description
 \end_layout
 
+\begin_layout Standard
+Symbolic Aggregation Approximation (SAX) was implemented as an in-network
+ data processing technique, compressing the representation while allowing
+ further processing on this symbolic string.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Demonstration-of-SAX"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows two rounds of SAX output following data collection, a window size
+ of 2 was used and an alphabet of length 4, i.e the characters 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+a
+\end_layout
+
+\end_inset
+
+ through 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+d
+\end_layout
+
+\end_inset
+
+ inclusive.
+ 12 C 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+floats
+\end_layout
+
+\end_inset
+
+ total 48 bytes of data, this can be reduced by a factor of 4 using 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+char
+\end_layout
+
+\end_inset
+
+ representation instead, a window size of 2 halves the number of output
+ samples and lowers the required memory to just 6 bytes.
+ 
+\end_layout
+
 \begin_layout Section
 Specification
+\end_layout
+
+\begin_layout Standard
+SAX is implemented in two separate steps, that of transforming the time-series
+ into Piecewise Aggregate Approximation (PAA) representation and then representi
+ng this numeric series with a symbolic alphabet.
+\end_layout
+
+\begin_layout Subsection
+PAA
+\end_layout
+
+\begin_layout Standard
+The standard deviation and mean of the data series were first calculated,
+ these are required for Z-normalisation.
+ This normalisation process takes a series of data and transforms it into
+ one with a mean of 0 and a standard deviation of 1.
+ This changes the context of the value from being measured in lux to being
+ a measure of a samples distance from the mean, 0, in standard deviations.
+ This allows comparison of different time-series.
+\end_layout
+
+\begin_layout Standard
+Following Z-normalisation, the size of the series is reduced by applying
+ a windowing function.
+ This takes subsequent equally-sized groups of samples and reduces the group
+ to the mean of those values.
+ 
+\end_layout
+
+\begin_layout Standard
+As a result of these two actions, the original time series has been reduced
+ to a given length of samples with a mean of 0 and standard deviation of
+ 1.
+\end_layout
+
+\begin_layout Subsection
+SAX
+\end_layout
+
+\begin_layout Standard
+With the result of the above, the remaining step is to replace each sample
+ value with a symbol to represent it.
+ The amount of symbols to be used is given, each will represent the same
+ probability range when considering a Gaussian distribution of mean 0 and
+ standard deviation of 1.
+ This can be achieved by using standard deviation breakpoints defined such
+ that the area under Gaussian curve between breakpoints is the same.
 \end_layout
 
 \begin_layout Section
 Implementation
 \end_layout
 
-\begin_layout Section
-Output
+\begin_layout Standard
+The SAX functionality was added as an alternative buffer rotating mechanism
+ over the original 12-to-1/4-to-1/12-to-12 aggregation system.
+ The length of the output buffer is calculated such that it can be allocated.
+ From here the input buffer is Z-normalised using the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+normaliseBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ function from the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+buffer.h
+\end_layout
+
+\end_inset
+
+ header.
+ This function iterates over each value in the buffer, subtracts the buffer's
+ mean and then divides by the standard deviation.
+ Following this, the buffer is aggregated using the same 4-to-1 aggregation
+ function 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+aggregateBuffer(bufferIn, bufferOut, groupSize)
+\end_layout
+
+\end_inset
+
+ as the group size is variable.
+ The output from this function represents the PAA form of the initial data
+ series.
+\end_layout
+
+\begin_layout Standard
+This final buffer is handled using 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+handleFinalBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ where a pre-processor directive checks whether SAX is being used.
+ If so the PAA buffer is 
+\emph on
+stringified
+\emph default
+ using 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+stringifyBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ which performs the SAX symbolic representation.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
-placement h
 wide false
 sideways false
 status open
@@ -139,8 +342,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename SaxBy2,10Break.png
-	width 100col%
+	filename SaxBy2,4Break.png
+	width 30col%
 
 \end_inset
 
@@ -152,7 +355,14 @@ status open
 
 \begin_layout Plain Layout
 Demonstration of SAX aggregation with window size of 2 and alphabet of length
- 10
+ 4
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Demonstration-of-SAX"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
