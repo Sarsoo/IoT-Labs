@@ -40,7 +40,7 @@ void // perform aggregation into groupSize (4 in the spec)
 aggregateBuffer(Buffer bufferIn, Buffer bufferOut, int groupSize)
 {
     int requiredGroups = ceil((float)bufferIn.length/groupSize); // number of groups
-    int finalGroupSize = (bufferIn.length % groupSize) * groupSize; // work out length of final group if bufferIn not of length that divides nicely
+    int finalGroupSize = bufferIn.length % groupSize; // work out length of final group if bufferIn not of length that divides nicely
 
     if(requiredGroups > bufferOut.length) // error check
     {

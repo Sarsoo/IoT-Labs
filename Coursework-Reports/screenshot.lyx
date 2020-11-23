@@ -109,7 +109,7 @@ IoT Aggregation Algorithm Coursework
 November 2020
 \end_layout
 
-\begin_layout Right Footer
+\begin_layout Right Header
 Andy Pack / 6420013
 \end_layout
 
@@ -133,11 +133,15 @@ Andy Pack / 6420013
 \emph on
 Standard deviation thresholds of 400 for some activity and 1,000 for high
  activity.
+\begin_inset VSpace 15pheight%
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
-placement bh
+placement h
 wide false
 sideways false
 status open
@@ -145,9 +149,9 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename 12to1.jpg
+	filename last12to1.png
 	lyxscale 50
-	width 80col%
+	width 100col%
 
 \end_inset
 
@@ -180,7 +184,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename 12to3.jpg
+	filename last4to1.png
 	lyxscale 50
 	width 100col%
 
@@ -215,7 +219,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename 12to12.jpg
+	filename last12to12.png
 	lyxscale 50
 	width 100col%
 

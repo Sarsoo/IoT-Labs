@@ -1,10 +1,12 @@
 #define READING_INTERVAL 2 //in Hz
 #define BUFFER_SIZE 12 // length of buffer to populate
 
-#define SD_THRESHOLD_SOME 400 // some activity, compress above, flatten below
+// below thresholds are calibrated for the cooja slider
+// they are likely not suitable for using on the mote
+#define SD_THRESHOLD_SOME 400 // some activity, 4-to-1 above, 12-to-1 below
 #define SD_THRESHOLD_LOTS 1000 // lots of activity, don't aggregate
 
-#define AGGREGATION_GROUP_SIZE 2 // group size to aggregate (4 in spec)
+#define AGGREGATION_GROUP_SIZE 4 // group size to aggregate (4 in spec)
 
 #define INITIAL_STATE true // whether begins running or not
 
@@ -39,7 +41,7 @@ PROCESS_THREAD(sensing_process, ev, data)
     static struct etimer timer;
     if(isRunning) etimer_set(&timer, CLOCK_SECOND/READING_INTERVAL); // start timer if running
     
-    event_buffer_full = process_alloc_event();
+    event_buffer_full = process_alloc_event(); // event for passing full buffers away for processing
     initIO();
     
     static Buffer buffer;
@@ -59,6 +61,7 @@ PROCESS_THREAD(sensing_process, ev, data)
             buffer.items[counter] = light_lx; // STORE
             
             printf("%2i/%i: ", counter + 1, buffer.length);putFloat(light_lx);putchar('\n'); // DISPLAY CURRENT VALUE
+            //printBuffer(buffer);putchar('\n'); // DISPLAY CURRENT BUFFER
             
             counter++;
             if(counter == buffer.length) // CHECK WHETHER FULL
@@ -126,10 +129,15 @@ handleSimpleBufferRotation(Buffer *inBufferPtr)
 
     Stats sd = calculateStdDev(inBuffer.items, inBuffer.length); // GET BUFFER STATISTICS
     
+    printf("B = ");printBuffer(inBuffer);putchar('\n');
+    printf("StdDev = ");putFloat(sd.std);putchar('\n');
+    printf("Aggregation = ");
+    
     /* LOTS OF ACTIVITY - LEAVE */
     if(sd.std > SD_THRESHOLD_LOTS)
     {
-        printf("Lots of activity, std. dev.: ");putFloat(sd.std);printf(", leaving as-is\n");
+        //printf("Lots of activity, std. dev.: ");putFloat(sd.std);printf(", leaving as-is\n");
+        puts("None");
         
         outBuffer = getBuffer(1); // get a dummy buffer, will swap items for efficiency
         
@@ -139,7 +147,8 @@ handleSimpleBufferRotation(Buffer *inBufferPtr)
     /* SOME ACTIVITY - AGGREGATE */
     else if(sd.std > SD_THRESHOLD_SOME)
     {
-        printf("Some activity, std. dev.: ");putFloat(sd.std);printf(", compressing buffer\n");
+        //printf("Some activity, std. dev.: ");putFloat(sd.std);printf(", compressing buffer\n");
+        puts("4-into-1");
         
         int outLength = ceil((float)inBuffer.length/AGGREGATION_GROUP_SIZE); // CALCULATE NUMBER OF OUTPUT ELEMENTS
         outBuffer = getBuffer(outLength); // CREATE OUTPUT BUFFER
@@ -150,7 +159,8 @@ handleSimpleBufferRotation(Buffer *inBufferPtr)
     /* NO ACTIVITY - FLATTEN */
     else
     {
-        printf("Insignificant std. dev.: ");putFloat(sd.std);printf(", squashing buffer\n");
+        //printf("Insignificant std. dev.: ");putFloat(sd.std);printf(", squashing buffer\n");
+        puts("12-into-1");
         
         outBuffer = getBuffer(1); // CREATE OUTPUT BUFFER
         
@@ -192,16 +202,16 @@ handleSAXBufferRotation(Buffer *inBufferPtr)
 void
 handleFinalBuffer(Buffer buffer)
 {
-    printf("Final buffer output: ");
-    printBuffer(buffer);putchar('\n');
-    printf("Mean: ");putFloat(buffer.stats.mean);putchar('\n');
-    printf("Std Dev: ");putFloat(buffer.stats.std);putchar('\n');putchar('\n');
-    
+    printf("X: ");printBuffer(buffer);putchar('\n');
 #ifdef SAX
+    printf("Mean: ");putFloat(buffer.stats.mean);putchar('\n');
+    printf("Std Dev: ");putFloat(buffer.stats.std);putchar('\n');putchar('\n');    
+
     char* saxString = stringifyBuffer(buffer);
-    printf("SAX: %s\n\n", saxString);
+    printf("SAX: %s\n", saxString);
     
     free(saxString);
 #endif
+    putchar('\n');
 }
 /*---------------------------------------------------------------------------*/

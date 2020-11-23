@@ -15,7 +15,7 @@ ceil(float in) // self-implement ceil func, no math.h
 }
 
 float
-sqrt(float in) // self-implement ceil sqrt, no math.h
+sqrt(float in) // self-implement sqrt func, no math.h
 {
     float sqrt = in/2;
     float temp = 0;

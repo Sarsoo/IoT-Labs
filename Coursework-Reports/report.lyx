@@ -36,7 +36,7 @@ customHeadersFooters
 \output_sync 0
 \bibtex_command default
 \index_command default
-\paperfontsize 10
+\paperfontsize default
 \spacing single
 \use_hyperref true
 \pdf_title "IoT Aggregation Algorithm Coursework"
@@ -83,13 +83,13 @@ customHeadersFooters
 \bottommargin 1.5cm
 \secnumdepth 3
 \tocdepth 3
-\paragraph_separation indent
-\paragraph_indentation default
+\paragraph_separation skip
+\defskip medskip
 \is_math_indent 0
 \math_numbering_side default
 \quotes_style english
 \dynamic_quotes 0
-\papercolumns 1
+\papercolumns 2
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
@@ -109,7 +109,7 @@ IoT Aggregation Algorithm Coursework
 November 2020
 \end_layout
 
-\begin_layout Right Footer
+\begin_layout Right Header
 Andy Pack / 6420013
 \end_layout
 
@@ -159,6 +159,17 @@ d
 \end_inset
 
  inclusive.
+ 
+\end_layout
+
+\begin_layout Standard
+The use of string representation allows further processing and analysis
+ techniques to be used such as string pattern matching, Euclidean distance
+ and hashing operations.
+\end_layout
+
+\begin_layout Standard
+It is also an opportunity to reduce the required memory footprint.
  12 C 
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
@@ -180,14 +191,55 @@ status open
 
 \begin_layout Plain Layout
 
-char
+chars
 \end_layout
 
 \end_inset
 
- representation instead, a window size of 2 halves the number of output
- samples and lowers the required memory to just 6 bytes.
- 
+ instead, a window size of 2 further halves the number of output samples
+ and lowers the required memory to just 6 bytes.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename SaxBy2,4Break.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Demonstration of SAX aggregation with window size of 2 and alphabet of length
+ 4
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Demonstration-of-SAX"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -195,9 +247,9 @@ Specification
 \end_layout
 
 \begin_layout Standard
-SAX is implemented in two separate steps, that of transforming the time-series
- into Piecewise Aggregate Approximation (PAA) representation and then representi
-ng this numeric series with a symbolic alphabet.
+SAX is implemented in two stages, that of transforming the time-series into
+ Piecewise Aggregate Approximation (PAA) representation and then representing
+ this numeric series with a symbolic alphabet.
 \end_layout
 
 \begin_layout Subsection
@@ -205,27 +257,47 @@ PAA
 \end_layout
 
 \begin_layout Standard
-The standard deviation and mean of the data series were first calculated,
- these are required for Z-normalisation.
- This normalisation process takes a series of data and transforms it into
- one with a mean of 0 and a standard deviation of 1.
- This changes the context of the value from being measured in lux to being
+PAA is an effective method for reducing the dimensionality of a time-series
+ by focusing on the trends and patterns of the data as opposed to individual
+ values.
+ It is a lossy operation that can be used to strike a balance between frequent
+ periodic sampling in order to keep the system responsive while reducing
+ the storage and processing requirements for such a large data stream.
+ This process is completed in two steps, Z-normalisation and aggregation.
+\end_layout
+
+\begin_layout Paragraph
+Z-Normalisation
+\end_layout
+
+\begin_layout Standard
+The standard deviation and mean of the data series were first calculated
+ using previously written functionality to calculate these values for arbitrary
+ arrays of numbers.
+ This normalisation process takes a series of data and transforms it such
+ that the output series has a mean of 0 and a standard deviation of 1.
+ This changes the context of the values from being measured in lux to being
  a measure of a samples distance from the mean, 0, in standard deviations.
- This allows comparison of different time-series.
+ This allows (somewhat) direct comparison of different time-series.
+\end_layout
+
+\begin_layout Paragraph
+Aggregation
 \end_layout
 
 \begin_layout Standard
 Following Z-normalisation, the size of the series is reduced by applying
  a windowing function.
  This takes subsequent equally-sized groups of samples and reduces the group
- to the mean of those values.
+ to the mean of those values, reducing the length of the series by a scale
+ factor equal to the size of the group.
  
 \end_layout
 
 \begin_layout Standard
-As a result of these two actions, the original time series has been reduced
- to a given length of samples with a mean of 0 and standard deviation of
- 1.
+Following Z-normalisation and aggregation, the original time series has
+ been reduced to a given length of samples with a mean of 0 and standard
+ deviation of 1.
 \end_layout
 
 \begin_layout Subsection
@@ -233,13 +305,70 @@ SAX
 \end_layout
 
 \begin_layout Standard
-With the result of the above, the remaining step is to replace each sample
- value with a symbol to represent it.
- The amount of symbols to be used is given, each will represent the same
- probability range when considering a Gaussian distribution of mean 0 and
- standard deviation of 1.
- This can be achieved by using standard deviation breakpoints defined such
- that the area under Gaussian curve between breakpoints is the same.
+SAX is an extension to the PAA representation that uses an alphabet of symbols
+ instead of numeric values.
+ Following Z-normalisation as part of the PAA process, a time-series of
+ data will follow a Gaussian distribution profile.
+ Each value describes how many standard deviations it is away from the mean
+ of the series (how far away from the central Gaussian peak it is), an approxima
+tion of the value could be found by dividing the area of the Gaussian profile
+ into segments and referring to each by a character.
+ Each data value can now be described by a segment identifier.
+ These segments should not be of equal width, however - values are likely
+ to be closer to the mean, referring to these by a single character would
+ be unproductive.
+ Instead the Gaussian profile is divided into segments corresponding to
+ equal probabilities or areas under the curve.
+\end_layout
+
+\begin_layout Standard
+These segments are realised using breakpoints, the standard deviations that
+ describe the edges of each segment.
+ By comparing each datum to subsequent breakpoints the segment that the
+ value lies within can be identified and the corresponding character retrieved
+ for representation.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename SaxBy4,8Break.png
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Demonstration of SAX aggregation with window size of 4 and alphabet of length
+ 8
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Demonstration-of-SAX-2"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -249,8 +378,34 @@ Implementation
 \begin_layout Standard
 The SAX functionality was added as an alternative buffer rotating mechanism
  over the original 12-to-1/4-to-1/12-to-12 aggregation system.
- The length of the output buffer is calculated such that it can be allocated.
- From here the input buffer is Z-normalised using the 
+ This rotation mechanism lies between receiving the full data buffer on
+ the processing thread and passing it to the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+handleFinalBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ function for display.
+ 
+\end_layout
+
+\begin_layout Standard
+The length of the output buffer is calculated using the full data buffer's
+ length and the group size with which it is divided.
+ This size is used to allocate a new buffer to store the PAA representation
+ of the data.
+ 
+\end_layout
+
+\begin_layout Standard
+From here the input buffer is Z-normalised using the 
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
 inline true
@@ -271,15 +426,20 @@ status open
 
 \begin_layout Plain Layout
 
-buffer.h
+sax.h
 \end_layout
 
 \end_inset
 
  header.
  This function iterates over each value in the buffer, subtracts the buffer's
- mean and then divides by the standard deviation.
- Following this, the buffer is aggregated using the same 4-to-1 aggregation
+ mean and then divides by the standard deviation (the mean and standard
+ deviation are stored as members of the buffer prior to passing to the function).
+ 
+\end_layout
+
+\begin_layout Standard
+Following this, the buffer is aggregated using the same 4-to-1 aggregation
  function 
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
@@ -293,12 +453,258 @@ aggregateBuffer(bufferIn, bufferOut, groupSize)
 
 \end_inset
 
- as the group size is variable.
+ used previously.
+ This functionality was used as the group size is variable and the same
+ required windowing and average function is used, as such it could be reused
+ with the desired aggregation level.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Demonstration-of-SAX-2"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ shows an output using a window size of 4 instead of figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Demonstration-of-SAX"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+'s width of 2.
  The output from this function represents the PAA form of the initial data
  series.
 \end_layout
 
 \begin_layout Standard
+The 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+handleFinalBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ function takes a 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+Buffer
+\end_layout
+
+\end_inset
+
+ struct as input which is defined as being a collection of 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+floats
+\end_layout
+
+\end_inset
+
+.
+ In order to maintain this structure and compatibility with the non-SAX
+ aggregation, the buffer is passed to this function in PAA form without
+ SAX conversion to a string.
+ In order to complete the system, the buffer must be 
+\emph on
+stringified
+\emph default
+ within this final method following a pre-processor check that SAX is being
+ used.
+ 
+\end_layout
+
+\begin_layout Standard
+SAX symbolic representation is completed using the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+stringifyBuffer(buffer)
+\end_layout
+
+\end_inset
+
+ function of the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+sax.h
+\end_layout
+
+\end_inset
+
+ header.
+ This function allocates a string of suitable size before iterating over
+ each value of the buffer and calling 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+valueToSAXChar(inputValue)
+\end_layout
+
+\end_inset
+
+ to retrieve the corresponding 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+char
+\end_layout
+
+\end_inset
+
+.
+ As the breakpoints are a constant for a given number of segments and would
+ require computation, the values for the breakpoints are defined by the
+ pre-processor based on the number of segments defined by the 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+SAX_BREAKPOINTS
+\end_layout
+
+\end_inset
+
+ macro.
+\end_layout
+
+\begin_layout Standard
+For each value, the breakpoints are iterated over.
+ Specific cases are defined for the beginning and end of the breakpoints
+ as these are one-sided inequalities.
+ For the rest, the value is compared to two neighbouring breakpoints.
+ A true condition for any of these checks indicates that the correct segment
+ for the value has been identified.
+ The same return value, 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+SAX_CHAR_START + i
+\end_layout
+
+\end_inset
+
+, is used in every case.
+ 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+SAX_CHAR_START
+\end_layout
+
+\end_inset
+
+ is a macro used to define the first character of the alphabet being used
+ for SAX representation (likely either 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+'a'
+\end_layout
+
+\end_inset
+
+ or 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+'A'
+\end_layout
+
+\end_inset
+
+), 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+i
+\end_layout
+
+\end_inset
+
+ is the iteration variable for the loop, it is used as an offset from the
+ alphabet start and is evaluated to a 
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline true
+status open
+
+\begin_layout Plain Layout
+
+char
+\end_layout
+
+\end_inset
+
+ for return.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Comment
+status open
+
+\begin_layout Plain Layout
 This final buffer is handled using 
 \begin_inset listings
 lstparams "basicstyle={\ttfamily}"
@@ -331,43 +737,6 @@ stringifyBuffer(buffer)
 \end_inset
 
  which performs the SAX symbolic representation.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename SaxBy2,4Break.png
-	width 30col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Demonstration of SAX aggregation with window size of 2 and alphabet of length
- 4
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Demonstration-of-SAX"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_inset
